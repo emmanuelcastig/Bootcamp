@@ -5,6 +5,7 @@ import co.com.pragma.model.bootcamp.gateways.BootcampRepository;
 import co.com.pragma.r2dbc.entity.BootcampCapacidadEntity;
 import co.com.pragma.r2dbc.entity.BootcampEntity;
 import co.com.pragma.r2dbc.helper.ReactiveAdapterOperations;
+import co.com.pragma.r2dbc.utils.BootcampCustomRepository;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -19,13 +20,15 @@ public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         > implements BootcampRepository {
 
     private final BootcampCapacidadReactiveRepository bootcampCapacidadReactiveRepository;
+    private final BootcampCustomRepository bootcampCustomRepository;
 
     public MyReactiveRepositoryAdapter(MyReactiveRepository repository,
                                        BootcampCapacidadReactiveRepository bootcampCapacidadReactiveRepository,
-                                       ObjectMapper mapper) {
+                                       ObjectMapper mapper, BootcampCustomRepository bootcampCustomRepository) {
 
         super(repository, mapper, d -> mapper.map(d, Bootcamp.class));
         this.bootcampCapacidadReactiveRepository = bootcampCapacidadReactiveRepository;
+        this.bootcampCustomRepository = bootcampCustomRepository;
     }
 
     @Override
@@ -45,6 +48,26 @@ public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
                                 bootcampCapacidadReactiveRepository.saveAll(bootcampCapacidad)
                         )
                         .then());
+    }
+
+    @Override
+    public Flux<Bootcamp> obtenerBootcampsPaginados(int page, int size, String sortBy, String order) {
+        int offset = page * size;
+
+        return bootcampCustomRepository.findBootcampsPaged(sortBy, order, size, offset)
+                .concatMap(entity ->
+                        repository.findCapacidadByBootcamp(entity.getId())
+                                .collectList()
+                                .map(capacidades -> Bootcamp.builder()
+                                        .id(entity.getId())
+                                        .nombre(entity.getNombre())
+                                        .descripcion(entity.getDescripcion())
+                                        .fechaLanzamiento(entity.getFechaLanzamiento())
+                                        .duracion(entity.getDuracion())
+                                        .capacidades(capacidades)
+                                        .build()
+                                )
+                );
     }
 
 }
