@@ -34,7 +34,7 @@ public class BootcampUseCase {
                         capacidadRestConsumer.listarCapacidades().collectMap(CapacidadResponse::getId, c -> c)
                                 .map(map -> {
                                     var capacidades = bootcamp.getCapacidades().stream()
-                                            .map(id -> map.get(id))
+                                            .map(map::get)
                                             .filter(c -> c != null)
                                             .map(c -> CapacidadBootcampResponse.builder()
                                                     .id(c.getId())
@@ -49,11 +49,17 @@ public class BootcampUseCase {
                                             .nombre(bootcamp.getNombre())
                                             .descripcion(bootcamp.getDescripcion())
                                             .fechaLanzamiento(bootcamp.getFechaLanzamiento())
-                                            .duracion(bootcamp.getDuracion().toString())
+                                            .duracion(bootcamp.getDuracion())
                                             .capacidades(capacidades)
                                             .build();
                                 })
                 );
     }
 
+    public Mono<Void> eliminarBootcamp(Long id) {
+        return bootcampRepository.eliminarBootcamp(id)
+                .flatMap(capacidadRestConsumer::eliminarCapacidadHuerfana
+                )
+                .then();
+    }
 }

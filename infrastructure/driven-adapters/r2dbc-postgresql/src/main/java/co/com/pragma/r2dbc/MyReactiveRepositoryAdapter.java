@@ -6,11 +6,13 @@ import co.com.pragma.r2dbc.entity.BootcampCapacidadEntity;
 import co.com.pragma.r2dbc.entity.BootcampEntity;
 import co.com.pragma.r2dbc.helper.ReactiveAdapterOperations;
 import co.com.pragma.r2dbc.utils.BootcampCustomRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Repository
 public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         Bootcamp,
@@ -67,6 +69,29 @@ public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
                                         .capacidades(capacidades)
                                         .build()
                                 )
+                );
+    }
+
+    @Override
+    public Flux<Long> eliminarBootcamp(Long id) {
+        return repository.findCapacidadByBootcamp(id)
+                .collectList()
+                .flatMapMany(capacidades ->
+                        // Eliminar primero el bootcamp
+                        repository.deleteById(id)
+                                .thenMany(Flux.fromIterable(capacidades))
+                )
+                .flatMap(capacidadId ->
+                        bootcampCapacidadReactiveRepository.findAllByIdCapacidad(capacidadId)
+                                .count()
+                                .flatMapMany(count -> {
+                                    if (count == 0) {
+                                        log.info("Se envia la capacidad: " + capacidadId);
+                                        return Flux.just(capacidadId); // huérfana → devolverla
+                                    } else {
+                                        return Flux.empty(); // sigue asociada
+                                    }
+                                })
                 );
     }
 

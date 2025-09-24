@@ -49,6 +49,16 @@ public class Handler {
                 );
     }
 
+    public Mono<ServerResponse> eliminarBootcamp(ServerRequest serverRequest) {
+        Long id = Long.parseLong(serverRequest.pathVariable("id"));
+        return bootcampUseCase.eliminarBootcamp(id)
+                .as(transactionalOperator::transactional)
+                .then(ServerResponse.noContent().build())
+                .onErrorResume(IllegalArgumentException.class, e ->
+                        ServerResponse.status(404).bodyValue(e.getMessage())
+                );
+    }
+
     public Mono<BootcampRequest> validacion(BootcampRequest request) {
         Set<ConstraintViolation<BootcampRequest>> violaciones = validator.validate(request);
         if (!violaciones.isEmpty()) {
