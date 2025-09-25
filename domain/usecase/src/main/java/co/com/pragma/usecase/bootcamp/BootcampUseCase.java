@@ -62,4 +62,33 @@ public class BootcampUseCase {
                 )
                 .then();
     }
+
+    public Flux<BootcampResponse> obtenerTodosLosBootcamps() {
+        return bootcampRepository.obtenerTodosLosBootcamps()
+                .flatMap(bootcamp ->
+                        capacidadRestConsumer.listarCapacidades().collectMap(CapacidadResponse::getId, c -> c)
+                                .map(map -> {
+                                    var capacidades = bootcamp.getCapacidades().stream()
+                                            .map(map::get)
+                                            .filter(c -> c != null)
+                                            .map(c -> CapacidadBootcampResponse.builder()
+                                                    .id(c.getId())
+                                                    .nombre(c.getNombre())
+                                                    .tecnologias(c.getTecnologias())
+                                                    .build()
+                                            )
+                                            .toList();
+
+                                    return BootcampResponse.builder()
+                                            .id(bootcamp.getId())
+                                            .nombre(bootcamp.getNombre())
+                                            .descripcion(bootcamp.getDescripcion())
+                                            .fechaLanzamiento(bootcamp.getFechaLanzamiento())
+                                            .duracion(bootcamp.getDuracion())
+                                            .capacidades(capacidades)
+                                            .build();
+                                })
+                );
+    }
+
 }

@@ -15,6 +15,6 @@ public class BootcampResponse {
     private String nombre;
     private String descripcion;
     private LocalDate fechaLanzamiento;
-    private String duracion;
+    private int duracion;
     private List<CapacidadBootcampResponse> capacidades;
 }

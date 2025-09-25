@@ -15,6 +15,6 @@ public class Bootcamp {
     private String nombre;
     private String descripcion;
     private LocalDate fechaLanzamiento;
-    private String duracion;
+    private int duracion;
     private List<Long> capacidades;
 }

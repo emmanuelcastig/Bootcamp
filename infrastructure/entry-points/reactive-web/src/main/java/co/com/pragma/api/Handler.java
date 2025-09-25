@@ -59,6 +59,14 @@ public class Handler {
                 );
     }
 
+    public Mono<ServerResponse>obtenerTodosLosBootcamps(ServerRequest serverRequest){
+        return ServerResponse.ok()
+                .body(
+                        bootcampUseCase.obtenerTodosLosBootcamps(),
+                        BootcampResponse.class
+                );
+    }
+
     public Mono<BootcampRequest> validacion(BootcampRequest request) {
         Set<ConstraintViolation<BootcampRequest>> violaciones = validator.validate(request);
         if (!violaciones.isEmpty()) {

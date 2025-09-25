@@ -41,7 +41,7 @@ public class BootcampCustomRepository {
                         .nombre(row.get("nombre", String.class))
                         .descripcion(row.get("descripcion", String.class))
                         .fechaLanzamiento(row.get("fecha_lanzamiento", LocalDate.class))
-                        .duracion(row.get("duracion", String.class))
+                        .duracion(row.get("duracion", int.class))
                         .build()
                 )
                 .all();

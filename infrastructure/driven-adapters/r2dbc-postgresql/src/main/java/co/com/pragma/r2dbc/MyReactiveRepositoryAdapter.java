@@ -95,4 +95,22 @@ public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
                 );
     }
 
+    @Override
+    public Flux<Bootcamp> obtenerTodosLosBootcamps() {
+        return repository.findAll()
+                .concatMap(entity ->
+                        repository.findCapacidadByBootcamp(entity.getId())
+                                .collectList()
+                                .map(capacidades -> Bootcamp.builder()
+                                        .id(entity.getId())
+                                        .nombre(entity.getNombre())
+                                        .descripcion(entity.getDescripcion())
+                                        .fechaLanzamiento(entity.getFechaLanzamiento())
+                                        .duracion(entity.getDuracion())
+                                        .capacidades(capacidades)
+                                        .build()
+                                )
+                );
+    }
+
 }

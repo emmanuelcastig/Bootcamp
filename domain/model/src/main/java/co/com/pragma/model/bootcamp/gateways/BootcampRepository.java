@@ -8,4 +8,5 @@ public interface BootcampRepository {
     Mono<Void> crearBootcamp(Bootcamp bootcamp);
     Flux<Bootcamp> obtenerBootcampsPaginados(int page, int size, String sortBy, String order);
     Flux<Long> eliminarBootcamp(Long id);
+    Flux<Bootcamp> obtenerTodosLosBootcamps();
 }

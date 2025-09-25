@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS bootcamps (
                                          nombre VARCHAR(50) NOT NULL,
     descripcion VARCHAR(90) NOT NULL,
     fecha_lanzamiento DATE NOT NULL,
-    duracion VARCHAR(50) NOT NULL
+    duracion INT NOT NULL
     );
 
 CREATE TABLE IF NOT EXISTS bootcamp_capacidad (

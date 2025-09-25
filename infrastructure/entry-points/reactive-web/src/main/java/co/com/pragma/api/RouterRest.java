@@ -14,6 +14,7 @@ public class RouterRest {
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
         return route(POST("/api/v1/bootcamp"), handler::crearBootcamp)
                 .andRoute(GET("/api/v1/bootcamp/paginado"), handler::obtenerBootcampsPaginados)
-                .andRoute(DELETE("/api/v1/bootcamp/{id}"), handler::eliminarBootcamp);
+                .andRoute(DELETE("/api/v1/bootcamp/{id}"), handler::eliminarBootcamp)
+                .andRoute(GET("/api/v1/bootcamp"), handler::obtenerTodosLosBootcamps);
     }
 }
